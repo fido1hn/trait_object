@@ -41,10 +41,12 @@ impl Sellable for Shield {
     }
 }
 
+// static dispatch - best in perfomance
 fn vendor_text_static<T: Sellable>(item: &T) -> String {
     format!("I offer you {}, [{}g]", item.description(), item.price())
 }
 
+// dynamic dispatch
 fn vendor_text_dynamic(item: &dyn Sellable) -> String {
     format!("I offer you {}, [{}g]", item.description(), item.price())
 }
@@ -65,10 +67,28 @@ fn main() {
     println!("{}", vendor_text_static(&sword));
     println!("{}", vendor_text_static(&shield));
 
-    // trait object
+    // trait object - if we decided to use dynamic dispatch
     let sellables: Vec<&dyn Sellable> = vec![&sword, &shield];
 
     for s in sellables {
-        println!("{}", vendor_text_dynamic(s))
+        println!("{}", vendor_text_dynamic(s));
+    }
+
+    // using box for perfomance boost with trait object
+    let box_sellables: Vec<Box<dyn Sellable>> = vec![
+        Box::new(Sword {
+            name: "Blade of heap".into(),
+            damage: 55,
+            swing_time_ms: 2000,
+        }),
+        Box::new(Shield {
+            name: "Shield of dynamic memory".into(),
+            armor: 130,
+            block: 55,
+        }),
+    ];
+
+    for s in &box_sellables {
+        println!("{}", vendor_text_dynamic(s.as_ref()));
     }
 }
