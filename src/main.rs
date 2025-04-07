@@ -45,6 +45,10 @@ fn vendor_text_static<T: Sellable>(item: &T) -> String {
     format!("I offer you {}, [{}g]", item.description(), item.price())
 }
 
+fn vendor_text_dynamic(item: &dyn Sellable) -> String {
+    format!("I offer you {}, [{}g]", item.description(), item.price())
+}
+
 fn main() {
     let sword = Sword {
         name: "Sword of cowardise".into(),
@@ -60,4 +64,11 @@ fn main() {
 
     println!("{}", vendor_text_static(&sword));
     println!("{}", vendor_text_static(&shield));
+
+    // trait object
+    let sellables: Vec<&dyn Sellable> = vec![&sword, &shield];
+
+    for s in sellables {
+        println!("{}", vendor_text_dynamic(s))
+    }
 }
